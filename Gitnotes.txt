@@ -1,0 +1,134 @@
+Here is the complete, from-scratch, step-by-step guide to doing your first Git and GitHub project directly on a Linux server (like an AWS EC2 instance). 
+
+Because Linux does not have a web browser to log into GitHub, we have to do things slightly differently than on Windows. We will split this into **The Browser Steps** (on your normal computer) and **The Linux Steps** (in your terminal).
+
+---
+
+### Phase 1: The Browser Steps (Get your Cloud Ready)
+*Do these steps on your normal computer's web browser.*
+
+**Step 1: Create an Empty GitHub Repository**
+1. Go to [github.com](https://github.com) and log in.
+2. Click the **+** icon in the top right corner and click **New repository**.
+3. Name the repository: `linux-hands-on`.
+4. Scroll down to the bottom and click **Create repository**. *(Leave this web page open; you will need the URL later).*
+
+**Step 2: Generate your "Linux Password" (Personal Access Token)**
+Because your Linux terminal doesn't have a web browser, GitHub won't let you use your normal password to upload code. You need a special code called a **Token**.
+1. On GitHub, click your **Profile Picture** (top right) -> Click **Settings**.
+2. Scroll all the way down the left-hand menu and click **Developer settings**.
+3. On the left, click **Personal access tokens**, then click **Tokens (classic)**.
+4. Click the **Generate new token** button -> **Generate new token (classic)**.
+5. In the "Note" box, type: *Linux Server*.
+6. Under "Expiration", leave it at 30 days.
+7. Under "Select scopes", **check the box that says `repo`** (this gives the token permission to upload code).
+8. Scroll to the bottom and click **Generate token**.
+9. **COPY THIS TOKEN NOW.** It will start with `ghp_...` Save it in a notepad on your computer. You will not be able to see it again!
+
+---
+
+### Phase 2: The Linux Steps (Setup your Server)
+*Now, SSH into your Linux server (AWS EC2) and type these commands.*
+
+**Step 1: Install Git**
+Update your server and install Git.
+*   **If you are using Ubuntu:**
+    ```bash
+    sudo apt update
+    sudo apt install git -y
+    ```
+*   **If you are using Amazon Linux / RedHat:**
+    ```bash
+    sudo yum update
+    sudo yum install git -y
+    ```
+
+**Step 2: Tell Git Who You Are**
+Run these two commands so Git knows who is writing the code:
+```bash
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+```
+
+**Step 3: Save Your Password (Optional but highly recommended)**
+Run this command so you don't have to copy-paste your long Token every single time you upload code:
+```bash
+git config --global credential.helper store
+```
+
+---
+
+### Phase 3: The Hands-On Project (Write & Upload Code)
+
+**Step 1: Create a Folder for Your Code**
+Create a new directory and go inside it:
+```bash
+mkdir linux-hands-on
+cd linux-hands-on
+```
+
+**Step 2: Turn on Git (Initialize)**
+Tell Git to start watching this folder:
+```bash
+git init
+```
+*(You will see a message: "Initialized empty Git repository")*
+
+**Step 3: Write Some Code**
+Let's create a simple HTML file using Linux commands:
+```bash
+echo "<h1>Hello from AWS Linux!</h1>" > index.html
+```
+
+**Step 4: Take the Snapshot (Add & Commit)**
+Check the status, get the file ready, and take the snapshot:
+```bash
+git status                  # Notice index.html is red (untracked)
+git add index.html          # This gets it ready for the snapshot
+git commit -m "First commit from Linux"   # This takes the snapshot
+```
+
+**Step 5: Connect Linux to GitHub**
+Remember the empty repository you created in Phase 1? Go back to that browser tab and look at the URL. It will look like this: `https://github.com/YOUR-USERNAME/linux-hands-on.git`.
+
+Run these commands in Linux to connect them:
+```bash
+git branch -M main
+git remote add origin https://github.com/YOUR-USERNAME/linux-hands-on.git
+```
+*(Make sure to replace `YOUR-USERNAME` with your actual GitHub username!)*
+
+**Step 6: Upload to GitHub (Push)**
+Now, push the code from your Linux server up to the cloud:
+```bash
+git push -u origin main
+```
+
+**The Login Prompt:**
+Because this is your first time pushing, Linux will ask for your credentials:
+1.  **Username:** Type your exact GitHub username and press Enter.
+2.  **Password:** Paste the `ghp_...` **Token** you created in Phase 1 and press Enter. *(Note: When you paste a password into Linux, the screen stays blank for security. Just paste it and hit Enter).*
+
+If it worked, you will see a success message! Go refresh your GitHub repository page in your web browser. You will see your `index.html` file sitting right there in the cloud.
+
+---
+
+### Phase 4: Test Your Daily Workflow
+To prove you've got it, try updating the file just like a real DevOps engineer would.
+
+1. **Modify the file:**
+   ```bash
+   echo "<p>Learning DevOps is awesome!</p>" >> index.html
+   ```
+2. **Take the snapshot:**
+   ```bash
+   git add .
+   git commit -m "Added a paragraph"
+   ```
+3. **Upload the snapshot:**
+   ```bash
+   git push
+   ```
+*(Notice that this time, it didn't ask for your password! That's because we used the `credential.helper store` command in Phase 2).*
+
+**Congratulations!** You just completed a full, real-world Git and GitHub workflow entirely from a Linux command line.
